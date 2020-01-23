@@ -22,8 +22,8 @@ class MotorDriver(object):
         self.BASE_PWM = 50
         self.MAX_PWM = 100
         
-        self.MULTIPLIER_STANDARD = 0.1
-        self.MULTIPLIER_PIVOT = 1.0
+        self.MULTIPLIER_STANDARD = 0.3
+        self.MULTIPLIER_PIVOT = 0.3
         
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
