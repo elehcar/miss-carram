@@ -11,7 +11,7 @@ class ImagePublisher(object):
 
     def __init__(self):
         self.node_rate = 1
-        self.image_pub = rospy.Publisher("image_topic", Image, queue_size=10)
+        self.image_pub = rospy.Publisher("image_topic", Image, queue_size=1)
         self.bridge = CvBridge()
         self.camera = PiCamera()
         self.camera.resolution = (640,480)
