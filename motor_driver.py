@@ -4,6 +4,7 @@ import rospy
 import RPi.GPIO as GPIO
 import time
 
+
 class MotorDriver(object):
     
     def __init__(self):
@@ -33,10 +34,6 @@ class MotorDriver(object):
         GPIO.setup(self.in3, GPIO.OUT)
         GPIO.setup(self.in4, GPIO.OUT)
         GPIO.setup(self.en2, GPIO.OUT)
-        #GPIO.output(self.in1, GPIO.LOW)
-        #GPIO.output(self.in2, GPIO.LOW)
-        #GPIO.output(self.in3, GPIO.LOW)
-        #GPIO.output(self.in4, GPIO.LOW)
         
         self.p1 = GPIO.PWM(self.en1, 1000)
         self.p2 = GPIO.PWM(self.en2, 1000)
@@ -105,7 +102,6 @@ class MotorDriver(object):
             wheel_turn_radius = None
         return wheel_turn_radius
 
-        
     def calculate_wheel_rpm(self, linear_speed, angular_speed, wheel_turn_radius):
         if wheel_turn_radius is not None:
             wheel_rpm = (angular_speed * wheel_turn_radius) / self.wheel_radius
@@ -156,16 +152,16 @@ class MotorDriver(object):
             pass
         
     def change_speed(self, ls, a_s):
-        # stabiliamo se il cerchio che dobbiamo percorrere  piccolo o grande
+        # stabiliamo se il cerchio che dobbiamo percorrere  e piccolo o grande
         body_turn_radius = self.calculate_body_turn_radius(ls, a_s)
         
         wheel = 'right'
-        #calcoliamo sulla base di quanto deve girare il robot qule  il raggio della curva delle signole ruote
+        # calcoliamo sulla base di quanto deve girare il robot quale  il raggio della curva delle signole ruote
         right_wheel_turn_radius = self.calculate_wheel_turn_radius(body_turn_radius, wheel)
         wheel = 'left'
         left_wheel_turn_radius = self.calculate_wheel_turn_radius(body_turn_radius, wheel)
         
-        #calcoliamo la velocita di rotazione delle singole ruote
+        # calcoliamo la velocita di rotazione delle singole ruote
         right_wheel_rpm = self.calculate_wheel_rpm(ls, a_s, right_wheel_turn_radius)    
         left_wheel_rpm = self.calculate_wheel_rpm(ls, a_s, left_wheel_turn_radius)
         

@@ -14,58 +14,45 @@ class UltraSuoni(object):
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         self.GPIO_TRIGGER = 4
+        self.ECHO_RIGHT = 26
+        self.ECHO_LEFT = 16
         GPIO.setup(self.GPIO_TRIGGER, GPIO.OUT)
-
-        ECHOS = {"ECHO_LEFT": 26, "ECHO_RIGHT": 16}
-        for e in ECHOS:
-            GPIO.setup(ECHOS[e], GPIO.IN)
+        GPIO.setup(self.ECHO_RIGHT, GPIO.IN)
+        GPIO.setup(self.ECHO_LEFT, GPIO.IN)
 
     def distance(self, e):
-        new_reading = False
-        counter = 0
+        GPIO.output(self.GPIO_TRIGGER, False)
+        time.sleep(0.1)
         GPIO.output(self.GPIO_TRIGGER, True)
         time.sleep(0.00001)
         GPIO.output(self.GPIO_TRIGGER, False)
 
         while GPIO.input(e) == 0:
-            pass
-            counter += 1
-            if counter == 5000:
-                new_reading = True
-                break
-        start_time = time.time()
-
-        if new_reading:
-            return False
+            start_time = time.time()
 
         while GPIO.input(e) == 1:
-            pass
-        end_time = time.time()
+            end_time = time.time()
 
         time_elapsed = end_time - start_time
         dist = (time_elapsed * 34300) / 2
         return dist
 
     def run_distance(self):
-        sensors = []
-        for e in self.ECHOS:
-            dist = self.distance(self.ECHOS[e])
-            sensors.append("{}: {}".format(e, dist))
-            time.sleep(1)
+        right_dist = self.distance(self.ECHO_RIGHT)
+        left_dist = self.distance(self.ECHOS_LEFT)
 
         ultra = TwoFloat()
-        ultra.left_us = sensors.dist[0][0]
-        ultra.right_us = sensors.dist[1][0]
-        try:
-            self.pub.publish(ultra)
-            rospy.loginfo('publishing ultrasonic distances')
-        except ROSSerializationException():
-            rospy.loginfo('invalid ultrasonic distances')
+        ultra.left_us = left_dist
+        ultra.right_us = right_dist
+        self.pub.publish(ultra)
+        rospy.loginfo('Distanza sinistra: ' + str(left_dist) + ", Distanza destra: " + str(right_dist))
+
 
 if __name__ == "__main__":
     ultra_suoni = UltraSuoni()
-    rospy.init("ultrasuoni", anonymous=True)
+    rospy.init_node("ultrasuoni", anonymous=True)
     loop = rospy.Rate(ultra_suoni.node_rate)
     while not rospy.is_shutdown():
         ultra_suoni.run_distance()
         loop.sleep()
+    GPIO.cleanup()
