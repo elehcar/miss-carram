@@ -47,20 +47,20 @@ class Distance:
                         largest = i
                 # Compute the x coordinate of the center of the largest contour
                 coordinates = cv2.moments(cnts[largest])
-                img_cnts = cv2.drawContours(image.copy(),cnts[largest], -1, (40,255,255))
+                # img_cnts = cv2.drawContours(image.copy(),cnts[largest], -1, (40,255,255))
                 #cv2.imshow('Immagine',img_cnts)
                 #cv2.waitKey(1000)
                 if coordinates["m00"] != 0:
                         target_x = int(coordinates['m10'] / coordinates['m00'])
                 else:
                         target_x = 0
-        return area, target_x, img_cnts
-        #return area, target_x
+        # return area, target_x, img_cnts
+        return area, target_x
 
     def distancetoCamera(self, sup):
-        if sup > 70000.: #target raggiunto
+        if sup > 70000.: #ostacolo troppo lontano
             return 0
-        elif sup < 1010.5: #target non visibile
+        elif sup < 1010.5: #ostacolo troppo vicino
             return 200
         else:
             f = interpolate.interp1d(self.x, self.y)
