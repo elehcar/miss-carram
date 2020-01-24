@@ -54,8 +54,8 @@ class UltraSuoni(object):
             time.sleep(1)
 
         ultra = TwoFloat()
-        ultra.left_us = sensors.dist[0]
-        ultra.right_us = sensors.dist[1]
+        ultra.left_us = sensors.dist[0][0]
+        ultra.right_us = sensors.dist[1][0]
         try:
             self.pub.publish(ultra)
             rospy.loginfo('publishing ultrasonic distances')
