@@ -56,9 +56,11 @@ class UltraSuoni(object):
         ultra = TwoFloat()
         ultra.left_us = sensors[0]
         ultra.right_us = sensors[1]
-        self.pub.publish(ultra)
-        rospy.loginfo('publishing ultrasonic distances')
-
+        try:
+            self.pub.publish(ultra)
+            rospy.loginfo('publishing ultrasonic distances')
+        except ROSSerializationException():
+            rospy.loginfo('invalid ultrasonic distances')
 
 if __name__ == "__main__":
     ultra_suoni = UltraSuoni()
