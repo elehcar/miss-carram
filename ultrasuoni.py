@@ -3,14 +3,14 @@ import rospy
 import RPi.GPIO as GPIO
 import time
 from time import sleep
+from robot.msg import TwoFloat
 
 
 class UltraSuoni(object):
 
     def __init__(self):
         self.node_rate = 10
-        self.pub1 = rospy.Publisher("ultraDx", float, queue_size=1)
-        self.pub2 = rospy.Publisher("ultraSx", float, queue_size=1)
+        self.pub = rospy.Publisher("ultraSuoni", TwoFloat , queue_size=1)
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         self.GPIO_TRIGGER = 4
@@ -52,8 +52,10 @@ class UltraSuoni(object):
             dist = self.distance(self.ECHOS[e])
             sensors.append("{}: {}".format(e, dist))
             time.sleep(1)
-        self.pub1.publish(sensors[0])
-        self.pub2.publish(sensors[1])
+        ultra = TwoFloat()
+        ultra.left_us= sensors[0]
+        ultra.right_us = sensors[1]
+        self.pub.publish(ultra)
         rospy.loginfo('publishing ultrasonic distances')
 
 
