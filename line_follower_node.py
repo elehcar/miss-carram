@@ -33,23 +33,23 @@ class LineFollower(object):
             # è arrivato alla linea di inizio/fine giro
             self.counter = self.counter + 1
             self.line_planning_pub.publish(counter)
+            self.cmd_vel.angular.z = None
+            self.cmd_vel.linear.x = None
         elif left_ir and not right_ir:
             # il sensore sx rileva la linea -> vado a sinistra
             self.cmd_vel.angular.z = self.angular_vel_base
             self.cmd_vel.linear.x = self.linear_vel_base
             print("SPEED==>[" + str(self.cmd_vel.linear.x) + "," + str(self.cmd_vel.angular.z) + "]")
-            self.line_foll_pub.publish(self.cmd_vel)
-
         elif right_ir and not left_ir:
             # il sensore dx rileva la linea -> vado a destra
             self.cmd_vel.angular.z = self.angular_vel_base * -1
             self.cmd_vel.linear.x = self.linear_vel_base
             print("SPEED==>[" + str(self.cmd_vel.linear.x) + "," + str(self.cmd_vel.angular.z) + "]")
-            self.line_foll_pub.publish(self.cmd_vel)
-
         else:
-            # sono nella carreggiata -> non pubblico nulla
-            pass
+            # sono nella carreggiata -> pubblico none
+            self.cmd_vel.angular.z = None
+            self.cmd_vel.linear.x = None
+        self.line_foll_pub.publish(self.cmd_vel)
 
 
 if __name__ == "__main__":

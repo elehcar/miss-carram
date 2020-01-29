@@ -14,8 +14,11 @@ class RobotMover(object):
     def cmd_vel_callback(self, data):
         linear_speed = data.linear.x
         angular_speed = data.angular.z
-        rospy.loginfo(data.linear)
-        self.motion_driver.change_speed(linear_speed, angular_speed)
+        if (linear_speed is None) and (angular_speed is None):
+            pass
+        else:
+            self.motion_driver.change_speed(linear_speed, angular_speed)
+        rospy.loginfo("Linear: " + str(linear_speed) + str(angular_speed))
 
 
 if __name__ == '__main__':

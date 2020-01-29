@@ -20,22 +20,21 @@ class ObstacleAvoidance(object):
         self.distanza_sx = 0
         # This way we process only half the frames
         self.bridge_object = CvBridge()
-        rospy.Subscriber("image_topic", Image, self.image_callback)
-        rospy.Subscriber("ultrasuoni_topic", TwoFloat, self.ultraSuoni_callback)
+        rospy.Subscriber("image_topic", Image, self.obstacle_callback, 0)
+        rospy.Subscriber("ultrasuoni_topic", TwoFloat, self.obstacle_callback, 1)
         self.pub = rospy.Publisher("change_obstacle", Twist, queue_size= 1)
         self.distance = Distance()
         self.linear_vel_base = linear_vel_base
         self.angular_vel_base = angular_vel_base
 
-    def ultraSuoni_callback(self, data):
-        self.distanza_sx = data.left_us
-        self.distanza_dx = data.right_us
-
-    def image_callback(self, data):
-        # We select bgr8 because its the OpenCV encoding by default
-        cv_image = self.bridge_object.imgmsg_to_cv2(data, "bgr8")
-        area, self.target = self.distance.find_area(cv_image)
-        self.distanza_ostacolo = self.distance.distancetoCamera(area)
+    def callback(self, data, args):
+        if args[0] == 0
+            cv_image = self.bridge_object.imgmsg_to_cv2(data, "bgr8")
+            area, self.target = self.distance.find_area(cv_image)
+            self.distanza_ostacolo = self.distance.distancetoCamera(area)
+        else:
+            self.distanza_sx = data.left_us
+            self.distanza_dx = data.right_us
 
     def calc_speed(self):
         speed = Twist()
@@ -43,59 +42,50 @@ class ObstacleAvoidance(object):
             if self.distanza_sx < 5 and self.distanza_dx < 5:  # se ho ostacoli a dx e sx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = 0
-                self.pub.publish(speed)
             elif self.distanza_sx < 5:  # se ho ostacolo a sx vado a dx
                 # imposto un'accelerazione angolare che lo fa spostare un po' verso dx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = self.angular_vel_base * -1
-                self.pub.publish(speed)
             elif self.distanza_dx < 5:  # se ho ostacolo a dx vado a sx
                 # imposto un'accelerazione angolare che lo fa spostare un po' verso sx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = self.angular_vel_base
-                self.pub.publish(speed)
             else:
-                pass
+                speed.linear.x = None
+                speed.angular.z = None
         else:  # ostacolo visibile
             if self.distanza_sx > 5 and self.distanza_dx > 5:  # non ho ostacoli vicini a dx e a sx -> considero l'ostacolo davanti
                 if self.target_x < self.w / 2:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base * -1
-                    self.pub.publish(speed)
                 elif self.target_x > self.w / 2:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base
-                    self.pub.publish(speed)
                 else:
                     speed.linear.z = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base
-                    self.pub.publish(speed)
             elif self.distanza_dx < 5 and self.distanza_sx < 5:  # ho ostacoli in tutte le direzioni -> mi fermo
                 speed.linear.x = 0
                 speed.angular.z = 0
-                self.pub.publish(speed)
             elif self.distanza_sx < 5:  # ho ostacolo davanti e a sx -> vado a dx basandomi sul target x altrimenti dritto
                 if self.target_x <= self.w / 2:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base * -1
-                    self.pub.publish(speed)
                 else:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = 0
-                    self.pub.publish(speed)
             else:  # ho ostacolo davanti e a dx -> vado a sx basandomi sul target x
                 if self.target_x >= self.w/2:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base
-                    self.pub.publish(speed)
                 else:
                     speed.linear.x = self.linear_vel_base
                     speed.angular.z = 0
-                    self.pub.publish(speed)
+        self.pub.publish(speed)
 
 
 if __name__ == '__main__':
-    rospy.init_node('obstacle_avoidance', anonymous=True)s
+    rospy.init_node('obstacle_avoidance', anonymous=True)
     obstacle_avoidance = ObstacleAvoidance(0.01, 0.1)
     while not rospy.is_shutdown():
         obstacle_avoidance.calc_speed()
