@@ -20,15 +20,15 @@ class ObstacleAvoidance(object):
         self.distanza_sx = 0
         # This way we process only half the frames
         self.bridge_object = CvBridge()
-        rospy.Subscriber("image_topic", Image, self.obstacle_callback, 0)
-        rospy.Subscriber("ultrasuoni_topic", TwoFloat, self.obstacle_callback, 1)
+        rospy.Subscriber("image_topic", Image, self.callback, 0)
+        rospy.Subscriber("ultrasuoni_topic", TwoFloat, self.callback, 1)
         self.pub = rospy.Publisher("change_obstacle", Twist, queue_size= 1)
         self.distance = Distance()
         self.linear_vel_base = linear_vel_base
         self.angular_vel_base = angular_vel_base
 
     def callback(self, data, args):
-        if args[0] == 0
+        if args[0] == 0 :
             cv_image = self.bridge_object.imgmsg_to_cv2(data, "bgr8")
             area, self.target = self.distance.find_area(cv_image)
             self.distanza_ostacolo = self.distance.distancetoCamera(area)
