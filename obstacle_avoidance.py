@@ -39,62 +39,63 @@ class ObstacleAvoidance(object):
 
     def calc_speed(self):
         speed = Twist()
-        if self.distanza_ostacolo == 200:
-            if self.distanza_sx < 5 and self.distanza_dx < 5:
+        if 100 < self.distanza_ostacolo <= 200:  # ostacolo non visibile o troppo lontano
+            if self.distanza_sx < 5 and self.distanza_dx < 5:  # se ho ostacoli a dx e sx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = 0
                 self.pub.publish(speed)
-            elif self.distanza_sx < 5:
+            elif self.distanza_sx < 5:  # se ho ostacolo a sx vado a dx
                 # imposto un'accelerazione angolare che lo fa spostare un po' verso dx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = self.angular_vel_base * -1
                 self.pub.publish(speed)
-            elif self.distanza_dx < 5:
+            elif self.distanza_dx < 5:  # se ho ostacolo a dx vado a sx
                 # imposto un'accelerazione angolare che lo fa spostare un po' verso sx
                 speed.linear.x = self.linear_vel_base
                 speed.angular.z = self.angular_vel_base
                 self.pub.publish(speed)
             else:
                 pass
-        elif self.distanza_sx > 5 and self.distanza_dx > 5:
-            if self.target_x < self.w / 2:
-                speed.linear.x = self.linear_vel_base
-                speed.angular.z = self.angular_vel_base * -1
-                self.pub.publish(speed)
-            elif self.target_x > self.w /2:
-                speed.linear.x = self.linear_vel_base
-                speed.angular.z = self.angular_vel_base
-                self.pub.publish(speed)
-            else :
-                speed.linear.z = self.linear_vel_base
-                speed.angular.z = self.angular_vel_base
-                self.pub.publish(speed)
-        elif self.distanza_dx < 5 and self.distanza_sx < 5:
-            speed.linear.x = 0
-            speed.angular.z = 0
-            self.pub.publish(speed)
-        elif self.distanza_sx < 5:
-            if self.target_x <= self.w / 2:
-                speed.linear.x = self.linear_vel_base
-                speed.angular.z = self.angular_vel_base* -1
-                self.pub.publish(speed)
-            else:
-                speed.linear.x = self.linear_vel_base
+        else:  # ostacolo visibile
+            if self.distanza_sx > 5 and self.distanza_dx > 5:  # non ho ostacoli vicini a dx e a sx -> considero l'ostacolo davanti
+                if self.target_x < self.w / 2:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = self.angular_vel_base * -1
+                    self.pub.publish(speed)
+                elif self.target_x > self.w / 2:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = self.angular_vel_base
+                    self.pub.publish(speed)
+                else:
+                    speed.linear.z = self.linear_vel_base
+                    speed.angular.z = self.angular_vel_base
+                    self.pub.publish(speed)
+            elif self.distanza_dx < 5 and self.distanza_sx < 5:  # ho ostacoli in tutte le direzioni -> mi fermo
+                speed.linear.x = 0
                 speed.angular.z = 0
                 self.pub.publish(speed)
-        else:
-            if self.target_x >= self.w/2:
-                speed.linear.x = self.linear_vel_base
-                speed.angular.z = self.angular_vel_base
-                self.pub.publish(speed)
-            else:
-                speed.linear.x = self.linear_vel_base
-                speed.angular.z = 0
-                self.pub.publish(speed)
+            elif self.distanza_sx < 5:  # ho ostacolo davanti e a sx -> vado a dx basandomi sul target x altrimenti dritto
+                if self.target_x <= self.w / 2:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = self.angular_vel_base * -1
+                    self.pub.publish(speed)
+                else:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = 0
+                    self.pub.publish(speed)
+            else:  # ho ostacolo davanti e a dx -> vado a sx basandomi sul target x
+                if self.target_x >= self.w/2:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = self.angular_vel_base
+                    self.pub.publish(speed)
+                else:
+                    speed.linear.x = self.linear_vel_base
+                    speed.angular.z = 0
+                    self.pub.publish(speed)
 
 
 if __name__ == '__main__':
-    rospy.init_node('obstacle_avoidance', anonymous=True)
+    rospy.init_node('obstacle_avoidance', anonymous=True)s
     obstacle_avoidance = ObstacleAvoidance(0.01, 0.1)
     while not rospy.is_shutdown():
         obstacle_avoidance.calc_speed()
