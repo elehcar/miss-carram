@@ -21,6 +21,7 @@ class IrNode(object):
         ir_sensors = TwoBool()
         ir_sensors.left_ir = IO.input(10)
         ir_sensors.right_ir = IO.input(9)
+        print("{INFRAROSSI}: sensing!")
         self.line_foll_pub.publish(ir_sensors)
 
 

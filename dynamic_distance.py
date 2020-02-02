@@ -18,7 +18,7 @@ class Distance:
         self.x = self.x.astype(float)
         self.y = self.y.astype(float)
 
-    def find_area(image):
+    def find_area(self, image):
         image_blur = cv2.GaussianBlur(image, (5, 5), 0)
         img_hsv = cv2.cvtColor(image_blur, cv2.COLOR_BGR2HSV)
         lowgreen = np.array([41, 180, 100])
@@ -30,7 +30,7 @@ class Distance:
         edged_img = cv2.Canny(mask_filter.copy(), 35, 125)
         # cv2.imshow('Edged', edged_img)
         # cv2.waitKey(1000)
-        _, cnts, hierarchy = cv2.findContours(edged_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts, hierarchy = cv2.findContours(edged_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not cnts:
             return 0, 0
         else:
@@ -53,13 +53,13 @@ class Distance:
                         target_x = int(coordinates['m10'] / coordinates['m00'])
                 else:
                         target_x = 0
-        return area, target_x, img_cnts
-        # return area, target_x
+        # return area, target_x, img_cnts
+        return area, target_x
 
     def distancetoCamera(self, sup):
-        if sup > 70000.: # target raggiunto
+        if sup > 70000:  # target raggiunto
             return 0
-        elif sup < 1010.5: # target non visibile
+        elif sup < 1010.5:  # target non visibile
             return 200
         else:
             f = interpolate.interp1d(self.x, self.y)

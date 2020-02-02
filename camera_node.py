@@ -28,7 +28,7 @@ class ImagePublisher(object):
             print(e)
 
         self.image_pub.publish(image_message)
-        rospy.loginfo('publishing image!')
+        print('{CAMERA_NODE} Publishing! ')
         self.rawCapture.truncate(0)
 
 

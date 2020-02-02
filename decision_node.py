@@ -9,39 +9,39 @@ from geometry_msgs.msg import Twist
 class DecisionNode(object):
 
     def __init__(self):
-        self.ob_linear = None
-        self.line_linear = None
-        self.ob_angular = None
-        self.line_angular = None
-        rospy.Subscriber("line_foll_topic", Twist, self.line_callback, 0)
-        rospy.Subscriber("change_obstacle", Twist, self.obstacle_callback, 1)
-        self.pub = rospy.Publisher("cmd_vel_topic", Twist, queue_size=10)
+        self.ob_linear = -1000
+        self.line_linear = -1000
+        self.ob_angular = -1000
+        self.line_angular = -1000
+        rospy.Subscriber("line_foll_topic", Twist, self.decision_callback, 0)
+        rospy.Subscriber("change_obstacle", Twist, self.decision_callback, 1)
+        self.pub = rospy.Publisher("cmd_vel_topic", Twist, queue_size=1)
 
-    def line_callback(self, data):
-        self.line_linear = data.linear.x
-        self.line_angular = data.angular.z
-
-    def obstacle_callback(self, data):
-        self.ob_linear = data.linear.x
-        self.ob_angular = data.angular.z
-
-    def listener(self):
+    def decision_callback(self, data, args):
         speed = Twist()
-        if (self.ob_linear is None) and (self.ob_angular is None):
+
+        if args == 0:
+            self.line_linear = data.linear.x
+            self.line_angular = data.angular.z
+        else:
+            self.ob_linear = data.linear.x
+            self.ob_angular = data.angular.z
+
+        if (self.ob_linear == -1000) and (self.ob_angular == -1000):
             speed.linear.x = self.line_linear
             speed.angular.z = self.line_angular
+            print("{DECISION_NODE} SPEED==> Line: [" + str(speed.linear.x) + "," + str(speed.angular.z) + "]")
+
         else:
             speed.linear.x = self.ob_linear
-            spped.angular.z = self.ob_angular
+            speed.angular.z = self.ob_angular
+            print("{DECISION_NODE} SPEED==> Obstacle: [" + str(speed.linear.x) + "," + str(speed.angular.z) + "]")
+
         self.pub.publish(speed)
 
 
 if __name__ == "__main__":
     rospy.init_node("decision_node", anonymous=True)
-    while not rospy.is_shutdown():
-        listener()
-        rospy.spin()
-
-
-
+    ob = DecisionNode()
+    rospy.spin()
 

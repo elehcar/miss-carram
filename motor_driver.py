@@ -20,7 +20,7 @@ class MotorDriver(object):
         self.en1 = 12
         self.en2 = 13
         
-        self.BASE_PWM = 50
+        self.BASE_PWM = 40
         self.MAX_PWM = 100
         
         self.MULTIPLIER_STANDARD = 0.3
@@ -40,6 +40,8 @@ class MotorDriver(object):
         
         self.p1.start(self.PWM1)
         self.p2.start(self.PWM2)
+
+        self.change_speed(0.05, 0)
         
     def __del__(self):
         GPIO.cleanup()
