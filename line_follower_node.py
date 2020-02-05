@@ -15,9 +15,9 @@ from geometry_msgs.msg import Twist
 class LineFollower(object):
 
     def __init__(self, linear_vel_base, angular_vel_base):
-        self.counter = 0
+        # self.counter = 0
         self.ir_sub = rospy.Subscriber("ir_node_topic", TwoBool, self.line_foll_callback)
-        self.line_planning_pub = rospy.Publisher("count_round", Int16, queue_size=1)
+        # self.line_planning_pub = rospy.Publisher("count_round", Int16, queue_size=1)
         self.line_foll_pub = rospy.Publisher("line_foll_topic", Twist, queue_size=1)
         self.cmd_vel = Twist()
         self.cmd_vel.linear.x = 0.0
@@ -31,8 +31,8 @@ class LineFollower(object):
 
         if left_ir and right_ir:
             # è arrivato alla linea di inizio/fine giro
-            self.counter = self.counter + 1
-            self.line_planning_pub.publish(counter)
+            # self.counter = self.counter + 1
+            # self.line_planning_pub.publish(counter)
             self.cmd_vel.angular.z = -1000
             self.cmd_vel.linear.x = -1000
         elif left_ir and not right_ir:
@@ -57,6 +57,5 @@ class LineFollower(object):
 
 if __name__ == "__main__":
     rospy.init_node("line_follower", anonymous=True)
-    line_follower = LineFollower(0.05, 0.1)
+    line_follower = LineFollower(0.10, 0.18)
     rospy.spin()
-

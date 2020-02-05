@@ -9,7 +9,7 @@ from std_msgs.msg import TwoFloat
 class UltraSuoni(object):
 
     def __init__(self):
-        self.node_rate = 1
+        self.node_rate = 10
         self.pub = rospy.Publisher("ultrasuoni_topic", TwoFloat, queue_size=1)
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)

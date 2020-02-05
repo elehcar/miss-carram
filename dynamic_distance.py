@@ -7,10 +7,10 @@ import csv
 class Distance:
 
     def __init__(self):
-        
+
         self.x = np.array([])
         self.y = np.array([])
-        file_name = open('Misure.csv', 'rt')
+        file_name = open('Obstacle_little.csv', 'rt')
         reader = csv.reader(file_name)
         for row in reader:
             self.x = np.append(self.x, row[1])
@@ -21,11 +21,11 @@ class Distance:
     def find_area(self, image):
         image_blur = cv2.GaussianBlur(image, (5, 5), 0)
         img_hsv = cv2.cvtColor(image_blur, cv2.COLOR_BGR2HSV)
-        lowgreen = np.array([41, 180, 100])
-        highgreen = np.array([65, 255, 255])
+        lowblue = np.array([80, 70, 20])
+        highblue = np.array([120, 255, 255])
 
-        green_mask = cv2.inRange(img_hsv, lowgreen, highgreen)
-        mask_filter = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+        blue_mask = cv2.inRange(img_hsv, lowblue, highblue)
+        mask_filter = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
 
         edged_img = cv2.Canny(mask_filter.copy(), 35, 125)
         # cv2.imshow('Edged', edged_img)
@@ -46,20 +46,20 @@ class Distance:
                         largest = i
                 # Compute the x coordinate of the center of the largest contour
                 coordinates = cv2.moments(cnts[largest])
-                img_cnts = cv2.drawContours(image.copy(),cnts[largest], -1, (40,255,255))
+                img_cnts = cv2.drawContours(image.copy(), cnts[largest], -1, (40, 255, 255))
                 # cv2.imshow('Immagine',img_cnts)
                 # cv2.waitKey(1000)
-                if coordinates["m00"] != 0:
-                        target_x = int(coordinates['m10'] / coordinates['m00'])
+                if coordinates['m00'] != 0:
+                    target_x = int(coordinates['m10'] / coordinates['m00'])
                 else:
-                        target_x = 0
+                    target_x = 0
         # return area, target_x, img_cnts
         return area, target_x
 
     def distancetoCamera(self, sup):
-        if sup > 70000:  # target raggiunto
+        if sup > 111459.0:  # ostacolo imminente
             return 0
-        elif sup < 1010.5:  # target non visibile
+        elif sup < 3937.5:  # ostacolo lontano
             return 200
         else:
             f = interpolate.interp1d(self.x, self.y)
