@@ -32,7 +32,9 @@ class ObstacleAvoidance(object):
     def callback(self, data, args):
         if args == 0:
             cv_image = self.bridge_object.imgmsg_to_cv2(data, "bgr8")
-            self.area, self.target_x = self.distance.find_area(cv_image)
+            cropped = cv_image[100:480, 0:640]
+
+            self.area, self.target_x = self.distance.find_area(cropped)
             self.distanza_ostacolo = self.distance.distancetoCamera(self.area)
             if 70 < self.distanza_ostacolo <= 100:
                 self.factor = 1
@@ -70,13 +72,13 @@ class ObstacleAvoidance(object):
         else:  # ostacolo visibile
             if self.distanza_sx > 15 and self.distanza_dx > 15:  # non ho ostacoli vicini a dx e a sx -> considero l'ostacolo davanti
                 if self.target_x < self.w / 2:
-                    speed.linear.x = self.linear_vel_base * self.factor
+                    speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base * self.factor
                 elif self.target_x > self.w / 2:
-                    speed.linear.x = self.linear_vel_base * self.factor
+                    speed.linear.x = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base * -1 * self.factor
                 else:
-                    speed.linear.z = self.linear_vel_base * self.factor
+                    speed.linear.z = self.linear_vel_base
                     speed.angular.z = self.angular_vel_base * -1 * self.factor
             elif self.distanza_dx < 15 and self.distanza_sx < 15:  # ho ostacoli in tutte le direzioni -> mi fermo
                 speed.linear.x = 0
@@ -108,4 +110,3 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         obstacle_avoidance.calc_speed()
         loop.sleep()
-
