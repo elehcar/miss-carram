@@ -3,7 +3,7 @@
 import rospy
 import cv2
 from landmark import Landmark
-from std_msgs.msg import IntString
+from std_msgs.msg import IntString, Float32
 from sensor_msgs.msg import Image
 
 
