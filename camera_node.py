@@ -13,11 +13,12 @@ class ImagePublisher(object):
     def __init__(self):
         self.node_rate = 10
         self.image_pub = rospy.Publisher("image_topic", Image, queue_size=1)
+        self.landmark_pub = rospy.Publisher("qr_topic", Image, queue_size=1)
         self.bridge = CvBridge()
         self.camera = PiCamera()
         self.camera.resolution = (640, 480)
         self.camera.framerate = 32
-        self.rawCapture = PiRGBArray(self.camera, size=(640,480))
+        self.rawCapture = PiRGBArray(self.camera, size=(640, 480))
 
     def get_img(self):
         self.camera.capture(self.rawCapture, format='bgr')
@@ -28,6 +29,7 @@ class ImagePublisher(object):
             print(e)
 
         self.image_pub.publish(image_message)
+        self.landmark_pub.publish(image_message)
         print('{CAMERA_NODE} Publishing! ')
         self.rawCapture.truncate(0)
 
