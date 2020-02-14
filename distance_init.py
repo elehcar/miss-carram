@@ -46,6 +46,20 @@ def find_area(image):
     # return area, target_x, img_cnts
     return area, target_x
 
+def get_qrarea(image):
+    detector = cv2.QRCodeDetector()
+    data, points, _ = detector.detectAndDecode(image)
+    area_qr = 0
+    if data:
+        x1 = points.item(0)
+        x2 = points.item(2)
+        y2 = points.item(3)
+        y3 = points.item(5)
+        h = abs(x1 - x2)
+        b = abs(y2 - y3)
+        area_qr = h * b
+    return area_qr
+
 camera = PiCamera()
 camera.resolution = (640, 480)
 camera.framerate = 32
@@ -58,11 +72,10 @@ while j < 150:
     camera.capture(rawCapture, format='bgr')
     imm = rawCapture.array
     if imm is not None:
-        area, _ = find_area(imm)
+        area = get_qrarea(imm)
         j = j + 10
         writer.writerow((j, area))
     cv2.imshow('Imm', imm)
     cv2.waitKey(0)
     rawCapture.truncate(0)
-
 

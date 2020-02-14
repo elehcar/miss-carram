@@ -1,3 +1,4 @@
+# coding=utf8
 import numpy as np
 import cv2
 from scipy import interpolate
@@ -58,11 +59,11 @@ class Distance:
         lowred = np.array([0, 57, 82])
         highred = np.array([21, 255, 255])
 
-        lowgreen = np.array([41, 120, 80])
+        lowgreen = np.array([41, 147, 80])
         highgreen = np.array([55, 255, 255])
 
-        lowblue = np.array([80, 70, 20])
-        highblue = np.array([120, 255, 255])
+        lowblue = np.array([72, 131,77])
+        highblue = np.array([110, 255, 255])
 
         green_mask = cv2.inRange(img_hsv, lowgreen, highgreen)
         blue_mask = cv2.inRange(img_hsv, lowblue, highblue)
@@ -76,12 +77,12 @@ class Distance:
         edged_img_red = cv2.Canny(mask_filter_red.copy(), 35, 125)
         edged_img_blue = cv2.Canny(mask_filter_blue.copy(), 35, 125)
 
-        # cv2.imshow('Image', edged_img_red)
+        # cv2.imshow('Image', edged_img_green)
         # cv2.waitKey(0)
         area_results = np.array([])
         target_results = np.array([])
 
-        # cv2.imshow('Edged', edged_img)
+        # cv2.imshow('Edged', edged_img)
         # cv2.waitKey(1000)
         cnts_green, hierarchy_green = cv2.findContours(edged_img_green.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts_red, hierarchy_red = cv2.findContours(edged_img_red.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -98,13 +99,12 @@ class Distance:
         target_results = np.append(target_results, target_green)
         target_results = np.append(target_results, target_blue)
         target_results = np.append(target_results, target_red)
-
         for i in area_results:
-             final_area = 0
-             if i > final_area:
-                 final_area = i
-                 index = np.where(area_results == i)
-                 final_target = target_results[index]
+            final_area = 0
+            if i > final_area:
+                final_area = i
+                index = np.where(area_results == i)
+                final_target = target_results[index]
 
         return final_area, final_target
 
@@ -116,4 +116,3 @@ class Distance:
         else:
             f = interpolate.interp1d(self.x, self.y)
             return f(sup)
-

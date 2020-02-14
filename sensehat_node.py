@@ -1,24 +1,27 @@
 #!/usr/bin/env python
 import rospy
-from geometry_msgs.msg import Twist
+from std_msgs.msg import Float32
+from sense_hat import SenseHat
 
-def talker():
-	pub = rospy.Publisher('speeds', Twist, queue_size= 10)
-	rospy.init_node('sensehat', anonymous= True)
-	rate = rospy.Rate(10)
+
+class SenseNode:
+
+	def __init__(self):
+		self.node_rate = 10
+		self.sense = SenseHat()
+		self.pub = rospy.Publisher('magnetometer_topic', Float32, queue_size=10)
+
+	def sensing(self):
+		north = self.sense.get_compass()
+		self.pub.publish(north)
+		print("{SENSE_HAT} North: " + str(north))
+
+
+if __name__ == '__main__':
+	sense_hat = SenseNode()
+	rospy.init_node("sense_hat", anonymous=True)
+	loop = rospy.Rate(sense_hat.node_rate)
 	while not rospy.is_shutdown():
-		msg = Twist()
-		msg.linear.x= 
-		msg.linear.y=
-		msg.linear.z=
-		msg.angular.x=
-		msg.angular.y=
-		msg.angular.z= 
-		rospy.loginfo(msg)
-		pub.publish(msg)
-		rate.sleep()
-if __name__== '__main__':
-	try:
-		talker()
-	except rospy.ROSInterruptException:
-		pass
+		sense_hat.sensing()
+		loop.sleep()
+
